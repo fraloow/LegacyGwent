@@ -13,8 +13,6 @@ namespace Cynthia.Card
         private const int boostPoint = 1;
         public async Task HandleEvent(BeforeCardBanish @event)
         {
-            await Game.Debug("触发雷比欧达效果");
-
             //如果是自身被放逐
             await Game.Debug(@event.Target.Status.Name);
             if (@event.Target == Card)
