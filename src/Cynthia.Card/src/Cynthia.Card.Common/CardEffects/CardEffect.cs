@@ -126,20 +126,20 @@ namespace Cynthia.Card
         }
 
         //使卡牌"进入墓地"
-        public virtual Task ToCemetery(CardBreakEffectType type = CardBreakEffectType.ToCemetery, bool isNeedBanish = true, bool isNeedSentEvent = true)
+        public virtual Task ToCemetery(CardBreakEffectType type = CardBreakEffectType.ToCemetery)
         {
-            return ToCemetery(discardInfo: (false, null), isRoundEnd: false, type: type, isNeedBanish: isNeedBanish, isNeedSentEvent: isNeedSentEvent);
+            return ToCemetery(discardInfo: (false, null), isRoundEnd: false, type: type);
         }
-        private async Task ToCemetery((bool isDiscard, GameCard discardSource) discardInfo, bool isRoundEnd, CardBreakEffectType type = CardBreakEffectType.ToCemetery, bool isNeedBanish = true, bool isNeedSentEvent = true)
+        private async Task ToCemetery((bool isDiscard, GameCard discardSource) discardInfo, bool isRoundEnd, CardBreakEffectType type = CardBreakEffectType.ToCemetery)
         {
             var isDead = Card.Status.CardRow.IsOnPlace();
             var deadposition = Game.GetCardLocation(Card);
-
+            
             //进入墓地后撤销护盾
-            Card.Status.IsShield = false;
+            Card.Status.IsShield=false;
 
             //立刻执行,将卡牌视作僵尸卡
-            if (Card.CardPoint() > 0 && Card.Status.CardRow.IsOnPlace())
+            if (Card.CardPoint() != 0 && Card.Status.CardRow.IsOnPlace())
             {
                 Card.Status.HealthStatus = -Card.Status.Strength;
             }
@@ -169,7 +169,7 @@ namespace Cynthia.Card
                     {
                         await Game.ShowCardOn(Card);
                         await Game.ClientDelay(50);
-                        if (isNeedBanish && Card.Status.Strength <= 0 && Card.Status.Type == CardType.Unit)
+                        if (Card.Status.Strength <= 0 && Card.Status.Type == CardType.Unit)
                         {
                             await Banish();
                             return;
@@ -187,22 +187,22 @@ namespace Cynthia.Card
             });
             async Task sendEventTask()
             {
-                if (Card.Status.IsDoomed || (isNeedBanish && Card.Status.Strength <= 0 && Card.Status.Type == CardType.Unit))//如果是佚亡,放逐
+                if (Card.Status.IsDoomed || (Card.Status.Strength <= 0 && Card.Status.Type == CardType.Unit))//如果是佚亡,放逐
                 {
                     await Banish();
                     return;
                 }
-                if ((Card.Status.CardRow != RowPosition.Banish) && isNeedSentEvent)
+                if (Card.Status.CardRow != RowPosition.Banish)
                     await Game.SendEvent(new AfterCardToCemetery(Card, deadposition, isRoundEnd));
                 //8888888888888888888888888888888888888888888888888888888888888888888888
                 //进入墓地(遗愿),应该触发对应事件<暂未定义,待补充>
                 if (!isRoundEnd)
                 {
-                    if (isNeedSentEvent && isDead && Card.Status.CardRow != RowPosition.Banish)//如果从场上进入墓地,并且没有被放逐
+                    if (isDead && Card.Status.CardRow != RowPosition.Banish)//如果从场上进入墓地,并且没有被放逐
                     {
                         await Game.SendEvent(new AfterCardDeath(Card, deadposition));
                     }
-                    else if (isNeedSentEvent && discardInfo.isDiscard && !deadposition.RowPosition.IsOnPlace())
+                    else if (discardInfo.isDiscard && !deadposition.RowPosition.IsOnPlace())
                     {
                         await Game.SendEvent(new AfterCardDiscard(Card, discardInfo.discardSource));
                     }
@@ -345,10 +345,7 @@ namespace Cynthia.Card
                 await Game.ShowBullet(source, Card, BulletType.GreenLight);
             }
             await Game.ShowCardNumberChange(Card, num, NumberType.White);
-            if (Card.Status.CardRow.IsOnRow())
-            {
-                await Game.ClientDelay(50);
-            }
+            await Game.ClientDelay(50);
             Card.Status.Strength += num;
             await Game.ShowSetCard(Card);
             await Game.SetPointInfo();
@@ -371,10 +368,7 @@ namespace Cynthia.Card
             //最大显示的数字,不超过这个值
             var showBear = Card.Status.Strength + Card.Status.HealthStatus;
             await Game.ShowCardNumberChange(Card, num > showBear ? -showBear : -num, NumberType.White);
-            if (Card.Status.CardRow.IsOnRow())
-            {
-                await Game.ClientDelay(50);
-            }
+            await Game.ClientDelay(50);
             Card.Status.Strength -= num;
             if (Card.Status.Strength < -Card.Status.HealthStatus) Card.Status.HealthStatus = -Card.Status.Strength;
             await Game.ShowSetCard(Card);
@@ -404,10 +398,7 @@ namespace Cynthia.Card
                 await Game.ShowBullet(source, Card, BulletType.GreenLight);
             }
             await Game.ShowCardNumberChange(Card, num, NumberType.Normal);
-            if (Card.Status.CardRow.IsOnRow())
-            {
-                await Game.ClientDelay(50);
-            }
+            await Game.ClientDelay(50);
             Card.Status.HealthStatus += num;
             await Game.ShowSetCard(Card);
             await Game.SetPointInfo();
@@ -435,10 +426,10 @@ namespace Cynthia.Card
             damageType = beforeEventPackage.DamageType;
 
             //如果有护盾，取消这一次的伤害
-            if (Card.Status.IsShield)
+            if(Card.Status.IsShield)
             {
                 await Game.ShowSetCard(Card);
-                Card.Status.IsShield = false;
+                Card.Status.IsShield=false;
                 return;
             }
 
@@ -498,10 +489,7 @@ namespace Cynthia.Card
             if (num > 0)
             {
                 await Game.ShowCardNumberChange(Card, -num, NumberType.Normal);
-                if (Card.Status.CardRow.IsOnRow())
-                {
-                    await Game.ClientDelay(50);
-                }
+                await Game.ClientDelay(50);
                 Card.Status.HealthStatus -= num;
                 await Game.ShowSetCard(Card);
                 await Game.SetPointInfo();

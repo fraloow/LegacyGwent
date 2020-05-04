@@ -24,9 +24,15 @@ public class GameInit : MonoBehaviour
     public RectTransform NotesContext;
 
     private GwentClientService _gwentClientService;
+    private AudioManager _audioManager;
 
     private void Start()
     {
+        _audioManager = AudioManager.instance;
+        if (_audioManager == null)
+        {
+            Debug.LogError("no audiomanager");
+        }
         _gwentClientService = DependencyResolver.Container.Resolve<GwentClientService>();
         ConfigureGame();
         LoadServerMessage();
@@ -70,17 +76,18 @@ public class GameInit : MonoBehaviour
         if (ClientGlobalInfo.IsLoadGlobal) return;
         ClientGlobalInfo.IsLoadGlobal = true;
         var globalUI = Instantiate(GlobalUI);
-        var musicSource = Instantiate(AudioSound);
+        _audioManager.PlaySound("Title");
+        //var musicSource = Instantiate(AudioSound);
         globalUI.name = "GlobalUI";
-        musicSource.name = "MusicSource";
+        //musicSource.name = "MusicSource";
         DontDestroyOnLoad(globalUI);
-        DontDestroyOnLoad(musicSource);
+        //DontDestroyOnLoad(musicSource);
 
         SetResolution(PlayerPrefs.GetInt("resolutionIndex", 2));
         SetQuality(PlayerPrefs.GetInt("quality", 2));
         SetCloseSound(PlayerPrefs.GetInt("isCloseSound", 1));
-        SetMusic(PlayerPrefs.GetInt("musicVolum", 5));
-        SetEffect(PlayerPrefs.GetInt("effectVolum", 5));
+        SetMusic(PlayerPrefs.GetInt("musicVolum", 8));
+        SetEffect(PlayerPrefs.GetInt("effectVolum", 8));
         NowVersionText.text = "当前版本为：" + ClientGlobalInfo.Version.ToString();
     }
 

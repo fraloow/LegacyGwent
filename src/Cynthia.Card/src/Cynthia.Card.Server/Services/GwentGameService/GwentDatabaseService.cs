@@ -91,16 +91,5 @@ namespace Cynthia.Card.Server
             temp.InsertOne(data);
             return true;
         }
-
-        public bool AddAIGameResult(GameResult data)
-        {
-            var temp = GetDatabase().GetCollection<GameResult>("aigameresults");
-            if (temp.AsQueryable().Any(x => data.Id == x.Id))
-            {
-                return false;
-            }
-            temp.InsertOne(data);
-            return true;
-        }
     }
 }

@@ -5,7 +5,6 @@ namespace Cynthia.Card.Server
         Standby,
         Match,
         PasswordMatch,
-        Play,
-        PlayWithAI,
+        Play
     }
 }

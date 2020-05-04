@@ -145,9 +145,8 @@ namespace Cynthia.Card.Client
 
         public IDictionary<string,GwentCard> ReadCardMapData()
         {
-            var path = Application.persistentDataPath;
 #if UNITY_WIN
-            path = Application.dataPath + "/StreamingFile" + "/CardData.json";
+            var path = Application.dataPath + "/StreamingFile" + "/CardData.json";
             if (!Directory.Exists(Application.dataPath + "/StreamingFile"))
             {
                 Directory.CreateDirectory(Application.dataPath + "/StreamingFile");
@@ -157,8 +156,20 @@ namespace Cynthia.Card.Client
                 Debug.Log("路径不存在,返回默认");
                 return GwentMap.CardMap;
             }
+#elif UNITY_EDITOR_WIN
+            var path = Application.dataPath + "/StreamingFile" + "/CardData.json";
+            if (!Directory.Exists(Application.dataPath + "/StreamingFile"))
+            {
+                Directory.CreateDirectory(Application.dataPath + "/StreamingFile");
+            }
+            if (!File.Exists(path))
+            {
+                Debug.Log("路径不存在,返回默认");
+                return GwentMap.CardMap;
+            }
+
 #elif UNITY_ANDROID
-            path = Application.persistentDataPath + "/CardData.json";
+            var path = Application.persistentDataPath + "/CardData.json";
             if (!Directory.Exists(Application.persistentDataPath))
             {
                 Directory.CreateDirectory(Application.persistentDataPath);
@@ -179,9 +190,19 @@ namespace Cynthia.Card.Client
 
         public void WriteCardMapData(string cardMapJson)
         {
-            var path = Application.persistentDataPath;
 #if UNITY_WIN
-            path = Application.dataPath + "/StreamingFile" + "/CardData.json";
+            var path = Application.dataPath + "/StreamingFile" + "/CardData.json";
+            if (!Directory.Exists(Application.dataPath + "/StreamingFile"))
+            {
+                Directory.CreateDirectory(Application.dataPath + "/StreamingFile");
+            }
+            if (!File.Exists(path))
+            {
+                Debug.Log("路径不存在,创造路径");
+                File.Create(path);
+            }
+#elif UNITY_EDITOR_WIN
+            var path = Application.dataPath + "/StreamingFile" + "/CardData.json";
             if (!Directory.Exists(Application.dataPath + "/StreamingFile"))
             {
                 Directory.CreateDirectory(Application.dataPath + "/StreamingFile");
@@ -192,7 +213,7 @@ namespace Cynthia.Card.Client
                 File.Create(path);
             }
 #elif UNITY_ANDROID
-            path = Application.persistentDataPath + "/CardData.json";
+            var path = Application.persistentDataPath + "/CardData.json";
             if(!Directory.Exists(Application.persistentDataPath))
             {
                 Directory.CreateDirectory(Application.persistentDataPath);

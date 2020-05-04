@@ -33,29 +33,6 @@ namespace Cynthia.Card
             .Select(x => x.Key);
         }
 
-        public static IEnumerable<GwentCard> DeckChange(IEnumerable<string> deck)
-        {
-            var step1 = deck.Select(x => CardMap[x]);
-            return step1.Select(x => new GwentCard()
-            {
-                Categories = x.Categories,
-                Faction = x.Faction,
-                Flavor = x.Flavor,
-                Group = x.Group,
-                Info = x.Info,
-                Name = x.Name,
-                Strength = x.Strength,
-                //-------
-                CardId = x.CardId,
-                IsCountdown = x.IsCountdown,
-                Countdown = x.Countdown,
-                IsDoomed = x.IsDoomed,
-                CardArtsId = x.CardArtsId,
-                CardType = x.CardType,
-                CardUseInfo = x.CardUseInfo,
-            });
-        }
-
         public static IDictionary<Categorie, string> CategorieInfoMap { get; } = new Dictionary<Categorie, string>()
         {
             { Categorie.DoubleAgent, "双面间谍" },
@@ -157,20 +134,7 @@ namespace Cynthia.Card
         }
 
         //更新CardMap内容请务必将CardMapVersion更新
-        public static Version CardMapVersion { get; } = new Version(1, 0, 0, 7);
-
-
-        public class MultilingualString
-        {
-            public IDictionary<LanguageType, string> Message { get; set; }
-        }
-
-        public enum LanguageType
-        {
-            Chinese,
-            English,
-        }
-
+        public static Version CardMapVersion { get; } = new Version(1, 0, 0, 3);
 
         public static IDictionary<string, GwentCard> CardMap { get; set; } = new Dictionary<string, GwentCard>
         {
@@ -4854,14 +4818,14 @@ namespace Cynthia.Card
                     Strength=1,
                     Group=Group.Gold,
                     Faction = Faction.Nilfgaard,
-                    CardUseInfo = CardUseInfo.AnyRow,
+                    CardUseInfo = CardUseInfo.EnemyRow,
                     CardType = CardType.Unit,
                     IsDoomed = false,
                     IsCountdown = false,
                     IsDerive = false,
-                    Categories = new Categorie[]{ Categorie.Witcher,Categorie.DoubleAgent},
+                    Categories = new Categorie[]{ Categorie.Witcher},
                     Flavor = "猎魔人绝不会死在自己的床上。",
-                    Info = "双面间谍。改变同排2个单位的锁定状态，随后汲食它们的所有战力。",
+                    Info = "间谍。改变同排2个单位的锁定状态，随后汲食它们的所有战力。",
                     CardArtsId = "16210100",
                 }
             },
@@ -5235,14 +5199,14 @@ namespace Cynthia.Card
                     Strength=1,
                     Group=Group.Silver,
                     Faction = Faction.Nilfgaard,
-                    CardUseInfo = CardUseInfo.AnyRow,
+                    CardUseInfo = CardUseInfo.EnemyRow,
                     CardType = CardType.Unit,
                     IsDoomed = false,
                     IsCountdown = false,
                     IsDerive = false,
-                    Categories = new Categorie[]{ Categorie.Mage,Categorie.DoubleAgent},
+                    Categories = new Categorie[]{ Categorie.Mage},
                     Flavor = "魔法的价值高于一切，高于所有争论和敌意。",
-                    Info = "双面间谍。将左侧单位的战力复制给右侧单位。",
+                    Info = "间谍。将左侧单位的战力复制给右侧单位。",
                     CardArtsId = "16220500",
                 }
             },
@@ -9585,7 +9549,7 @@ namespace Cynthia.Card
                     IsDerive = false,
                     Categories = new Categorie[]{ Categorie.Support,Categorie.Doomed},
                     Flavor = "跪在我身边，向圣母低头。",
-                    Info = "复活1个史凯利杰铜色/银色单位。",
+                    Info = "复活1个铜色/银色单位。",
                     CardArtsId = "15221100",
                 }
             },
@@ -10582,11 +10546,11 @@ namespace Cynthia.Card
                 }
             },
             {
-                "70002",//狄拉夫：高等吸血鬼
+                "70002",//考德威尔伯爵
                 new GwentCard()
                 {
                     CardId ="70002",
-                    Name = "狄拉夫：高等吸血鬼",
+                    Name = "考德威尔伯爵",
                     Strength = 6,
                     Group = Group.Gold,
                     Faction = Faction.Neutral,
@@ -10595,10 +10559,10 @@ namespace Cynthia.Card
                     IsDoomed = false,
                     IsCountdown = false,
                     IsDerive = false,
-                    Categories = new Categorie[]{ Categorie.Vampire},
+                    Categories = new Categorie[]{ },
                     Flavor = "",
-                    Info = "择一：从牌库中打出一张战力不高于自身的铜色单位，在回合结束将它摧毁；或吞噬牌库中一张战力高于自身的铜色单位牌，将它的战力作为自身的增益。",
-                    CardArtsId = "d13720000",
+                    Info = "择一：从牌库中打出一张战力不高于自身的铜色单位，在回合结束把它送进墓地；或吞噬牌库中一张战力高于自身的铜色单位牌，将它的战力作为自身的增益。",
+                    CardArtsId = "14800000",
                 }
             },
             {
@@ -10820,108 +10784,29 @@ namespace Cynthia.Card
                     Info = "部署：从牌库弃掉一张倾盆大雨，然后在其敌我双方同排降下倾盆大雨。",
                     CardArtsId = "d16740000",
                 }
-            },
-            {
-
-                "70014",//童话国度：公正女神
-                new GwentCard()
-                {
-                    CardId = "70014",
-                    Name = "童话国度：公正女神",
-                    Strength = 0,
-                    Group = Group.Gold,
-                    Faction = Faction.Neutral,
-                    CardUseInfo = CardUseInfo.MyRow,
-                    CardType = CardType.Unit,
-                    IsDoomed = false,
-                    IsCountdown = false,
-                    IsDerive = true,
-                    Categories = new Categorie[]{ },
-                    Flavor = "",
-                    Info = "游戏开始时，将本卡置入墓地。\n双方都放弃跟牌后，给先手方增加自身战力的点数，然后放逐自身。\n免疫。无法被召唤、复活、强化、削弱、增益、伤害、魅惑、变形。",
-                    CardArtsId = "d17010000",
-                }
-            },{
-                "70015",//布洛克莱昂哨兵
-                new GwentCard()
-                {
-                    CardId = "70015",
-                    Name = "布洛克莱昂哨兵",
-                    Strength = 8,
-                    Group = Group.Copper,
-                    Faction = Faction.ScoiaTael,
-                    CardUseInfo = CardUseInfo.MyRow,
-                    CardType = CardType.Unit,
-                    IsDoomed = false,
-                    IsCountdown = false,
-                    IsDerive = false,
-                    Categories = new Categorie[]{ Categorie.Dryad},
-                    Flavor = "",
-                    Info = "己方回合结束时，如果对手同排单位数量正好为4个，则对对方同排所有单位造成1点伤害。",
-                    CardArtsId = "d14380000",
-                }
-            },
-            {
-                "70016",//苏克鲁斯
-                new GwentCard()
-                {
-                    CardId = "70016",
-                    Name = "苏克鲁斯",
-                    Strength = 8,
-                    Group = Group.Silver,
-                    Faction = Faction.Skellige,
-                    CardUseInfo = CardUseInfo.MyRow,
-                    CardType = CardType.Unit,
-                    IsDoomed = false,
-                    IsCountdown = false,
-                    IsDerive = false,
-                    Categories = new Categorie[]{ Categorie.Support},
-                    Flavor = "",
-                    Info = "部署：选择手牌中的一张铜色牌，丢弃所有牌组中该牌的同名牌。",
-                    CardArtsId = "d18870000",
-                }
-            },
-            {
-                "70017",//辛特拉战地医师
-                new GwentCard()
-                {
-                    CardId = "70017",
-                    Name = "辛特拉战地医师",
-                    Strength = 5,
-                    Group = Group.Copper,
-                    Faction = Faction.NorthernRealms,
-                    CardUseInfo = CardUseInfo.MyRow,
-                    CardType = CardType.Unit,
-                    IsDoomed = false,
-                    IsCountdown = false,
-                    IsDerive = false,
-                    Categories = new Categorie[] { Categorie.Support,Categorie.Cintra},
-                    Flavor = "",
-                    Info = "部署：将 1 个非同名友军铜色单位洗回牌组，然后从牌库打出 1 张随机铜色单位牌。",
-                    CardArtsId = "d17110000",
-                }
-            },
-            {
-                "70018",//掠夺者猎人噩梦铠甲
-                new GwentCard()
-                {
-                    CardId = "70018",
-                    Name = "掠夺者猎人噩梦铠甲",
-                    Strength = 0,
-                    Group = Group.Gold,
-                    Faction = Faction.NorthernRealms,
-                    CardUseInfo = CardUseInfo.AnyPlace,
-                    CardType = CardType.Special,
-                    IsDoomed = false,
-                    IsCountdown = false,
-                    IsDerive = true,
-                    Categories = new Categorie[] { Categorie.Special},
-                    Flavor = "来自噩梦....",
-                    Info = "游戏开始时,将这张卡置入墓地。\n若在墓地,己方卡组的单位无法从卡组移动至墓地,免疫决斗伤害,且打出时候获得1-2点伤害或1-2点增益。",
-                    CardArtsId = "d20470000",
-                }
-            },
-
+            }
         };
+        public static IEnumerable<GwentCard> DeckChange(IEnumerable<string> deck)
+        {
+            var step1 = deck.Select(x => CardMap[x]);
+            return step1.Select(x => new GwentCard()
+            {
+                Categories = x.Categories,
+                Faction = x.Faction,
+                Flavor = x.Flavor,
+                Group = x.Group,
+                Info = x.Info,
+                Name = x.Name,
+                Strength = x.Strength,
+                //-------
+                CardId = x.CardId,
+                IsCountdown = x.IsCountdown,
+                Countdown = x.Countdown,
+                IsDoomed = x.IsDoomed,
+                CardArtsId = x.CardArtsId,
+                CardType = x.CardType,
+                CardUseInfo = x.CardUseInfo,
+            });
+        }
     }
 }

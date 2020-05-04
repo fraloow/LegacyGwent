@@ -10,7 +10,6 @@ using System.Collections.Concurrent;
 using Alsein.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using Cynthia.Card.AI;
 
 namespace Cynthia.Card.Server
 {
@@ -160,7 +159,7 @@ namespace Cynthia.Card.Server
             {
                 _ = _gwentMatchs.StopMatch(connectionId);//停止匹配
             }
-            if (_users[connectionId].UserState == UserState.Play || _users[connectionId].UserState == UserState.PlayWithAI)//如果用户正在进行对局
+            if (_users[connectionId].UserState == UserState.Play)//如果用户正在进行对局
             {
                 _gwentMatchs.PlayerLeave(connectionId, exception);
             }
@@ -181,7 +180,7 @@ namespace Cynthia.Card.Server
 查看实时在线人数可查网站http://cynthia.ovyno.com:5005
 欢迎加群闲聊约战~关注第一消息
 群号:945408322
-本作永久免费开源,详细欢迎入群了解
+本作永久免费开源,详细欢迎入群了解:)
 
 注意事项: 
 1. 账号密码与原服务器分开，需要重新注册
@@ -189,15 +188,10 @@ namespace Cynthia.Card.Server
 3. 全部更新内容请参照https://shimo.im/docs/TQdjjwpPwd9hJhK
     （群公告中可直接点开链接）
 
-2020年4月28日更新
-1.将所有的ai密码设定为[如果有其他无密码匹配正在进行,则匹配玩家,如果没有,则匹配对应ai]。
-2.增加密码后缀 #f 例如[ai1#f] 作用是无视正在进行无密码匹配的玩家,强制进行对应ai匹配。
-
-2020年4月27日更新
-1.修复主页AI强退导致显示游戏状态残留。
-2.修复AI对战中会卡住的bug。
-3.替换默认AI为杰洛特新星(密码AI),猎龙人团密码改为(AI1),不区分大小写。
-
+3.30日更新
+修正茜格德莉法，伯爵，薇薇安，攻城后援的bug，
+削弱格莱尼斯·爱普·洛纳克，哈蒙德，湖中仙女，
+实装昆恩印记。
 详细更新内容请看上面的石墨文档链接
 ";
         }
@@ -214,34 +208,28 @@ namespace Cynthia.Card.Server
 
         public IList<GameResult> ResultList { get; private set; } = new List<GameResult>();
 
-        public void InvokeGameOver(GameResult result, bool isOnlyShow)
+        public void InvokeGameOver(GameResult result)
         {
-            // if (_env.IsProduction())
-            // {
-            if (isOnlyShow)
+            if (_env.IsProduction())
             {
-                _databaseService.AddAIGameResult(result);
+                if (_databaseService.AddGameResult(result))
+                {
+                    lock (ResultList)
+                    {
+                        ResultList.Add(result);
+                    }
+                }
+                OnGameOver?.Invoke(result);
             }
-            else
-            {
-                _databaseService.AddGameResult(result);
-            }
-            lock (ResultList)
-            {
-                ResultList.Add(result);
-            }
-            OnGameOver?.Invoke(result);
-            // }
         }
 
-        public (IList<IGrouping<UserState, User>>, IList<(string, string)>, IList<(string, string)>) GetUsers()
+        public (IList<IGrouping<UserState, User>>, IList<(string, string)>) GetUsers()
         {
-            var list = _gwentMatchs.GwentRooms.Where(x => x.IsReady && x.Player1 is ClientPlayer && x.Player2 is ClientPlayer).Select(x => (x.Player1.PlayerName, x.Player2.PlayerName)).ToList();
-            var aiList = _gwentMatchs.GwentRooms.Where(x => x.IsReady && (x.Player1 is AIPlayer || x.Player2 is AIPlayer)).Select(x => (x.Player1.PlayerName, x.Player2.PlayerName)).ToList();
-            return (_users.Select(x => x.Value).Where(x => x.UserState != UserState.Play && x.UserState != UserState.PlayWithAI).GroupBy(x => x.UserState).ToList(), list, aiList);
+            var list = _gwentMatchs.GwentRooms.Where(x => x.IsReady).Select(x => (x.Player1.CurrentUser.PlayerName, x.Player2.CurrentUser.PlayerName)).ToList();
+            return (_users.Select(x => x.Value).Where(x => x.UserState != UserState.Play).GroupBy(x => x.UserState).ToList(), list);
         }
 
-        public event Action<(IList<IGrouping<UserState, User>>, IList<(string, string)>, IList<(string, string)>)> OnUserChanged;
+        public event Action<(IList<IGrouping<UserState, User>>, IList<(string, string)>)> OnUserChanged;
 
         public event Action<GameResult> OnGameOver;
 
